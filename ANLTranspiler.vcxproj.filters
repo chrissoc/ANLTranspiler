@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\anl">
+      <UniqueIdentifier>{3a3e8852-67fa-4363-9d8f-d9da6e9351f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\anl\lang">
+      <UniqueIdentifier>{6cfe07d5-29d1-4a2f-b231-bc09391caa28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\anl\VM">
+      <UniqueIdentifier>{be80d219-795e-4039-b151-38910c72c6da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ANLtoCPP">
+      <UniqueIdentifier>{5d169aab-0491-4a9a-8c2c-3c4bff495bcc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="accidental-noise-library\VM\coordinate.h">
+      <Filter>Source Files\anl\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\VM\hashing.h">
+      <Filter>Source Files\anl\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\VM\instruction.h">
+      <Filter>Source Files\anl\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\VM\kernel.h">
+      <Filter>Source Files\anl\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\VM\noise_gen.h">
+      <Filter>Source Files\anl\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\VM\noise_lut.h">
+      <Filter>Source Files\anl\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\VM\random_gen.h">
+      <Filter>Source Files\anl\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\VM\utility.h">
+      <Filter>Source Files\anl\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\VM\vm.h">
+      <Filter>Source Files\anl\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\lang\NoiseBuilder.h">
+      <Filter>Source Files\anl\lang</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\lang\NoiseParser.h">
+      <Filter>Source Files\anl\lang</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\lang\NoiseParserAST.h">
+      <Filter>Source Files\anl\lang</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\lang\NoiseParserEmitter.h">
+      <Filter>Source Files\anl\lang</Filter>
+    </ClInclude>
+    <ClInclude Include="accidental-noise-library\lang\NoiseParserToken.h">
+      <Filter>Source Files\anl\lang</Filter>
+    </ClInclude>
+    <ClInclude Include="Output.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ANLtoCPP\ANLtoC.h">
+      <Filter>Source Files\ANLtoCPP</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="accidental-noise-library\VM\coordinate.inl">
+      <Filter>Source Files\anl\VM</Filter>
+    </None>
+    <None Include="accidental-noise-library\VM\hashing.inl">
+      <Filter>Source Files\anl\VM</Filter>
+    </None>
+    <None Include="accidental-noise-library\VM\kernel.inl">
+      <Filter>Source Files\anl\VM</Filter>
+    </None>
+    <None Include="accidental-noise-library\VM\noise_gen.inl">
+      <Filter>Source Files\anl\VM</Filter>
+    </None>
+    <None Include="accidental-noise-library\VM\noise_lut.inl">
+      <Filter>Source Files\anl\VM</Filter>
+    </None>
+    <None Include="accidental-noise-library\VM\vm.inl">
+      <Filter>Source Files\anl\VM</Filter>
+    </None>
+    <None Include="LICENSE">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="accidental-noise-library\lang\NoiseBuilder.cpp">
+      <Filter>Source Files\anl\lang</Filter>
+    </ClCompile>
+    <ClCompile Include="accidental-noise-library\lang\NoiseParser.cpp">
+      <Filter>Source Files\anl\lang</Filter>
+    </ClCompile>
+    <ClCompile Include="accidental-noise-library\lang\NoiseParserAST.cpp">
+      <Filter>Source Files\anl\lang</Filter>
+    </ClCompile>
+    <ClCompile Include="accidental-noise-library\lang\NoiseParserEmitter.cpp">
+      <Filter>Source Files\anl\lang</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ANLtoCPP\ANLtoC.cpp">
+      <Filter>Source Files\ANLtoCPP</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
