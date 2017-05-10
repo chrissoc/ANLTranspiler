@@ -1,0 +1,8 @@
+/////////////////////////////////////////
+//
+// File Header Place Holder
+//
+/////////////////////////////////////////
+#include <string>
+
+std::string OutputFullCppFile(std::string CppExpressionToExecute);
