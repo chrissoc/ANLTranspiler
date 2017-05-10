@@ -1,0 +1,4 @@
+[submodule "accidental-noise-library"]
+	path = accidental-noise-library
+	url = git@github.com:chrissoc/accidental-noise-library.git
+	branch = Dev
