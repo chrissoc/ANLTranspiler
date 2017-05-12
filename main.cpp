@@ -5,13 +5,13 @@
 /////////////////////////////////////////
 
 
-#include <ANLtoCPP/ANLtoC.h>
+#include "ANLtoCPP/ANLtoC.h"
 #include <iostream>
 #include <string>
 #include <stdio.h>
 #include <memory>
 #include <ctime>
-#include <Output.h>
+#include "Output.h"
 
 #define ANL_IMPLEMENTATION
 // ANL is currently in a transition to a single file format, thus
@@ -20,33 +20,93 @@
 #include <accidental-noise-library/anl.h>
 #include <accidental-noise-library/lang/NoiseParser.h>
 
+std::string GetFileName(std::string file)
+{
+	std::string::size_type AltSeperator = file.find_last_of('/');
+	std::string::size_type Seperator = file.find_last_of('\\');
+
+	if ((Seperator < AltSeperator && AltSeperator != std::string::npos) || Seperator == std::string::npos)
+		Seperator = AltSeperator;
+
+	if (Seperator == std::string::npos)
+		return file;
+
+	return file.substr(Seperator + 1);
+}
+
+std::string GetDirectory(std::string file)
+{
+	std::string::size_type AltSeperator = file.find_last_of('/');
+	std::string::size_type Seperator = file.find_last_of('\\');
+
+	if ((Seperator < AltSeperator && AltSeperator != std::string::npos) || Seperator == std::string::npos)
+		Seperator = AltSeperator;
+
+	if (Seperator == std::string::npos)
+		return "";
+
+	return file.substr(0, Seperator);
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc < 2)
 	{
 		std::cerr << "Missing arguments." << std::endl;
-		std::cerr << "USAGE: ANLTranspiler.exe anlLangSourceFile.anl > ResultFile.cpp" << std::endl;
+		std::cerr << "USAGE: ANLTranspiler.exe anlLangSourceFile.anl output.cpp output.h" << std::endl;
 		std::cerr << "  The anlLangSourceFile.anl will be parsed and converted to an internal" << std::endl;
-		std::cerr << "  anl::CKernel which will then be converted to cplusplus and sent to stdout" << std::endl;
+		std::cerr << "  anl::CKernel which will then be converted to cplusplus and output as" << std::endl;
+		std::cerr << "  the provided source and header files" << std::endl;
 		return 0;
 	}
 
-	std::string FileName = argv[1];
+	std::string InputFileName = argv[1];
+	std::string OutputSourceFileName;
+	std::string OutputHeaderFileName;
+	if (argc > 2)
+		OutputSourceFileName = argv[2];
+	if (argc > 3)
+		OutputHeaderFileName = argv[3];
+
+	std::string HeaderFileRelativeToSource; // ie with any common directory information stripped
+	{
+		std::string HeaderDir = GetDirectory(OutputHeaderFileName);
+		std::string HeaderFile = GetFileName(OutputHeaderFileName);
+		std::string SourceDir = GetDirectory(OutputSourceFileName);
+		std::string SourceFile = GetFileName(OutputSourceFileName);
+
+		std::size_t DivergentIndex = 0;
+		for (std::size_t i = 0; i < SourceDir.size() && i < HeaderDir.size(); ++i)
+		{
+			if (SourceDir[i] == HeaderDir[i])
+				DivergentIndex++;
+			else
+				break;
+		}
+
+		std::string Dir = HeaderDir.substr(DivergentIndex);
+		std::cerr << "HeaderFile: " << OutputHeaderFileName << std::endl;
+		std::cerr << "SourceFile: " << OutputSourceFileName << std::endl;
+		if (Dir.size() > 0)
+			HeaderFileRelativeToSource = Dir + "/" + HeaderFile;
+		else
+			HeaderFileRelativeToSource = HeaderFile;
+	}
 
 	FILE* f = nullptr;
-	if (0 != fopen_s(&f, FileName.c_str(), "r")) {
-		std::cerr << "Unable to open file: " << FileName << std::endl;
+	if (0 != fopen_s(&f, InputFileName.c_str(), "r")) {
+		std::cerr << "Unable to open file: " << InputFileName << std::endl;
 		return -9;
 	}
 	if (fseek(f, 0, SEEK_END) != 0) {
-		std::cerr << "Seek Error for file: " << FileName << std::endl;
+		std::cerr << "Seek Error for file: " << InputFileName << std::endl;
 		return -10;
 	}
 
 	long FileLength = ftell(f);
 
 	if (fseek(f, 0, SEEK_SET) != 0) {
-		std::cerr << "Seek Error for file: " << FileName << std::endl;
+		std::cerr << "Seek Error for file: " << InputFileName << std::endl;
 		return -10;
 	}
 
@@ -55,7 +115,7 @@ int main(int argc, char* argv[])
 		auto Buffer = std::make_unique<uint8_t[]>(FileLength+1);
 		size_t AmountRead = fread(Buffer.get(), 1, FileLength, f);
 		if (AmountRead != FileLength && feof(f) == 0) {
-			std::cerr << "Read Error for file: " << FileName << std::endl;
+			std::cerr << "Read Error for file: " << InputFileName << std::endl;
 			return -10;
 		}
 		fclose(f);
@@ -70,16 +130,19 @@ int main(int argc, char* argv[])
 	if (!success)
 	{
 		auto ErrorMessages = NoiseParser->FormErrorMsgs();
-		std::cerr << "Error parsing TerrainV noise file: " << FileName
+		std::cerr << "Error parsing TerrainV noise file: " << InputFileName
 			<< "\nErrors:\n" << ErrorMessages
-			<< "\n\n Contents of \"" << FileName
+			<< "\n\n Contents of \"" << InputFileName
 			<< "\"\n" << FullText << std::endl;
 		return -30;
 	}
 	else
 	{
-		std::string Code = ANLtoC::KernelToC(NoiseParser->GetKernel(), NoiseParser->GetParseResult());
-		Code = OutputFullCppFile(Code);
+		std::string Code;
+		std::string HeaderFile;
+		std::string Struct;
+		ANLtoC::KernelToC(NoiseParser->GetKernel(), NoiseParser->GetParseResult(), Code, Struct);
+		OutputFullCppFile(Code, Struct, HeaderFileRelativeToSource, Code, HeaderFile);
 		std::string header = "// Generated file - Do not edit. Generated by ANLTranspiler at ";
 		time_t CurrentTime = time(0);
 		char TimeBuffer[100];
@@ -87,7 +150,41 @@ int main(int argc, char* argv[])
 		header.append(TimeBuffer);
 		header.append("\n");
 		Code.insert(0, header);
-		std::cout << Code << std::endl;
+		HeaderFile.insert(0, header);
+		
+		if(OutputSourceFileName != "")
+		{
+			FILE* f = nullptr;
+			if (0 != fopen_s(&f, OutputSourceFileName.c_str(), "w")) {
+				std::cerr << "Unable to open file: " << OutputSourceFileName << std::endl;
+				return -9;
+			}
+
+			size_t AmountWritten = fwrite(Code.c_str(), 1, Code.size(), f);
+			if (AmountWritten != Code.size())
+			{
+				std::cerr << "Write failed to file: " << OutputSourceFileName << std::endl;
+			}
+
+			fclose(f);
+		}
+
+		if (OutputHeaderFileName != "")
+		{
+			FILE* f = nullptr;
+			if (0 != fopen_s(&f, OutputHeaderFileName.c_str(), "w")) {
+				std::cerr << "Unable to open file: " << OutputHeaderFileName << std::endl;
+				return -9;
+			}
+
+			size_t AmountWritten = fwrite(HeaderFile.c_str(), 1, HeaderFile.size(), f);
+			if (AmountWritten != HeaderFile.size())
+			{
+				std::cerr << "Write failed to file: " << OutputHeaderFileName << std::endl;
+			}
+
+			fclose(f);
+		}
 
 		anl::CNoiseExecutor vm(NoiseParser->GetKernel());
 		double VMResult = vm.evaluateScalar(0.5, 0.5, NoiseParser->GetParseResult());

@@ -1,11 +1,17 @@
+/////////////////////////////////////////
+//
+// File Header Place Holder
+//
+/////////////////////////////////////////
 
 #include <string>
 
 const static std::string OutputString = R"abc(
-#include <bitset>
 #include <string>
+#include <vector>
 #include <cmath>
 #include <accidental-noise-library/anl.h>
+#include "<HEADER_FILE_NAME>"
 
 double hex_function(double x, double y);// from vm.cpp
 
@@ -401,23 +407,23 @@ double Select_Blend(double low, double high, double control, double threshold, d
 	return low + (high - low) * blend;
 }
 
-double ANL_CPP_Evaluate(const Point EvalPoint)
+double ANL_CPP_Evaluate(const Point EvalPoint, const ANL_CPP_NamedInput& NamedInput)
 {
 <THIS_IS_WHERE_THE_CODE_GOES>
 	return FinalResult;
 }
 
-double ANL_CPP_EvalScalar(double x, double y)
+double ANL_CPP_EvalScalar(double x, double y, const ANL_CPP_NamedInput& NamedInput)
 {
 	Point p;
 	p.x = p.y = p.z = p.w = p.u = p.v = 0.0;
 	p.dimensions = 2;
 	p.x = x;
 	p.y = y;
-	return ANL_CPP_Evaluate(p);
+	return ANL_CPP_Evaluate(p, NamedInput);
 }
 
-double ANL_CPP_EvalScalar(double x, double y, double z)
+double ANL_CPP_EvalScalar(double x, double y, double z, const ANL_CPP_NamedInput& NamedInput)
 {
 	Point p;
 	p.x = p.y = p.z = p.w = p.u = p.v = 0.0;
@@ -425,16 +431,34 @@ double ANL_CPP_EvalScalar(double x, double y, double z)
 	p.x = x;
 	p.y = y;
 	p.z = z;
-	return ANL_CPP_Evaluate(p);
+	return ANL_CPP_Evaluate(p, NamedInput);
 }
 )abc";
 
-static const std::string CodeReplaceToken = "<THIS_IS_WHERE_THE_CODE_GOES>";
+static const std::string HeaderOutput = R"abc(
 
-std::string OutputFullCppFile(std::string CppExpressionToExecute)
+struct ANL_CPP_NamedInput
 {
-	std::string Result = OutputString;
-	std::size_t Offset = Result.find(CodeReplaceToken);
-	Result.replace(Offset, CodeReplaceToken.size(), CppExpressionToExecute);
-	return Result;
+<THIS_IS_WHERE_THE_NAMED_INPUT_GOES>
+};
+
+double ANL_CPP_EvalScalar(double x, double y, const ANL_CPP_NamedInput& NamedInput);
+double ANL_CPP_EvalScalar(double x, double y, double z, const ANL_CPP_NamedInput& NamedInput);
+
+)abc";
+
+static const std::string NamedInputReplaceToken = "<THIS_IS_WHERE_THE_NAMED_INPUT_GOES>";
+static const std::string CodeReplaceToken = "<THIS_IS_WHERE_THE_CODE_GOES>";
+static const std::string HeaderFileNameReplaceToken = "<HEADER_FILE_NAME>";
+
+void OutputFullCppFile(std::string CppExpressionToExecute, std::string NamedInputStructGuts, std::string HeaderFileName, std::string& SourceFile, std::string& HeaderFile)
+{
+	SourceFile = OutputString;
+	HeaderFile = HeaderOutput;
+	std::size_t Offset = SourceFile.find(CodeReplaceToken);
+	SourceFile.replace(Offset, CodeReplaceToken.size(), CppExpressionToExecute);
+	Offset = SourceFile.find(HeaderFileNameReplaceToken);
+	SourceFile.replace(Offset, HeaderFileNameReplaceToken.size(), HeaderFileName);
+	Offset = HeaderFile.find(NamedInputReplaceToken);
+	HeaderFile.replace(Offset, NamedInputReplaceToken.size(), NamedInputStructGuts);
 }

@@ -12,7 +12,7 @@ namespace anl {
 }
 
 namespace ANLtoC {
-	std::string KernelToC(anl::CKernel& Kernel, anl::CInstructionIndex& Root);
+	void KernelToC(anl::CKernel& Kernel, anl::CInstructionIndex& Root, std::string& ExpressionToExecute, std::string& NamedInputStructGuts);
 }
 
 

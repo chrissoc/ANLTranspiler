@@ -10,6 +10,7 @@
 #include <array>
 #include <accidental-noise-library/VM/kernel.h>
 #include <sstream>
+#include <tuple>
 
 using namespace anl;
 
@@ -143,6 +144,11 @@ namespace ANLtoC {
 		case OP_Seed:
 		case OP_Constant:
 			return ToString(i.outfloat_);
+
+		case OP_NamedInput:
+		{
+			return "NamedInput." + i.namedInput;
+		}
 
 		case OP_ValueBasis:
 		{
@@ -666,7 +672,7 @@ namespace ANLtoC {
 	}
 }
 
-std::string ANLtoC::KernelToC(CKernel & Kernel, CInstructionIndex& Root)
+void ANLtoC::KernelToC(anl::CKernel& Kernel, anl::CInstructionIndex& Root, std::string& ExpressionToExecute, std::string& NamedInputStructGuts)
 {
 	ANLtoC_EmitData Data(*Kernel.getKernel());
 	Data.DomainInputStack.push_back("EvalPoint");
@@ -675,16 +681,27 @@ std::string ANLtoC::KernelToC(CKernel & Kernel, CInstructionIndex& Root)
 	
 	std::string Body = InstructionToElement(Data, index);
 
-	std::string Out;
-	Out += "\tbool CacheIsValid[" + std::to_string(Data.CacheSize) + "];\n";
-	Out += "\tdouble Cache[" + std::to_string(Data.CacheSize) + "];\n";
-	Out += "\tfor(int i = 0; i < " + std::to_string(Data.CacheSize) + "; ++i)\n";
-	Out += "\t\tCacheIsValid[i] = false;\n";
-	Out += "\n";
-	Out += "\tdouble FinalResult = ";
-	Out += Body;
-	Out += ";";
-	return Out;
+	// search through the Kernel and generate a list of all NamedInput
+	NamedInputStructGuts.clear();
+	std::vector<std::tuple<std::string, double>> NameList = Kernel.ListNamedInput();
+	for (auto& NameValuePair : NameList)
+	{
+		std::string& Name = std::get<0>(NameValuePair);
+		double DefaultValue = std::get<1>(NameValuePair);
+
+		NamedInputStructGuts += "\tdouble " + Name + " = " + ToString(DefaultValue) + ";\n";
+	}
+	
+
+	ExpressionToExecute.clear();
+	ExpressionToExecute += "\tbool CacheIsValid[" + std::to_string(Data.CacheSize) + "];\n";
+	ExpressionToExecute += "\tdouble Cache[" + std::to_string(Data.CacheSize) + "];\n";
+	ExpressionToExecute += "\tfor(int i = 0; i < " + std::to_string(Data.CacheSize) + "; ++i)\n";
+	ExpressionToExecute += "\t\tCacheIsValid[i] = false;\n";
+	ExpressionToExecute += "\n";
+	ExpressionToExecute += "\tdouble FinalResult = ";
+	ExpressionToExecute += Body;
+	ExpressionToExecute += ";";
 }
 
 
