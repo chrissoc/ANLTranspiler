@@ -85,8 +85,7 @@ int main(int argc, char* argv[])
 		}
 
 		std::string Dir = HeaderDir.substr(DivergentIndex);
-		std::cerr << "HeaderFile: " << OutputHeaderFileName << std::endl;
-		std::cerr << "SourceFile: " << OutputSourceFileName << std::endl;
+
 		if (Dir.size() > 0)
 			HeaderFileRelativeToSource = Dir + "/" + HeaderFile;
 		else
