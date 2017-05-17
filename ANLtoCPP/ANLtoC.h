@@ -5,6 +5,7 @@
 /////////////////////////////////////////
 
 #include <string>
+#include <vector>
 
 namespace anl {
 	class CKernel;
@@ -12,7 +13,13 @@ namespace anl {
 }
 
 namespace ANLtoC {
-	void KernelToC(anl::CKernel& Kernel, anl::CInstructionIndex& Root, std::string& ExpressionToExecute, std::string& NamedInputStructGuts);
+	struct FunctionData
+	{
+		std::string FunctionImplementation;
+		unsigned int RelatedIndex;
+	};
+
+	void KernelToC(anl::CKernel& Kernel, anl::CInstructionIndex& Root, std::string& ExpressionToExecute, std::string& NamedInputStructGuts, std::vector<FunctionData>& FunctionList);
 }
 
 

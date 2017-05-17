@@ -5,6 +5,7 @@
 /////////////////////////////////////////
 
 #include <string>
+#include "ANLtoCPP/ANLtoC.h"
 
 const static std::string OutputString = R"abc(
 #include <string>
@@ -407,6 +408,8 @@ double Select_Blend(double low, double high, double control, double threshold, d
 	return low + (high - low) * blend;
 }
 
+<THIS_IS_WHERE_ADDITIONAL_FUNCTIONS_GO>
+
 double ANL_CPP_Evaluate(const Point EvalPoint, const ANL_CPP_NamedInput& NamedInput)
 {
 <THIS_IS_WHERE_THE_CODE_GOES>
@@ -447,18 +450,29 @@ double ANL_CPP_EvalScalar(double x, double y, double z, const ANL_CPP_NamedInput
 
 )abc";
 
+static const std::string AdditionalFunctionsReplaceToken = "<THIS_IS_WHERE_ADDITIONAL_FUNCTIONS_GO>";
 static const std::string NamedInputReplaceToken = "<THIS_IS_WHERE_THE_NAMED_INPUT_GOES>";
 static const std::string CodeReplaceToken = "<THIS_IS_WHERE_THE_CODE_GOES>";
 static const std::string HeaderFileNameReplaceToken = "<HEADER_FILE_NAME>";
 
-void OutputFullCppFile(std::string CppExpressionToExecute, std::string NamedInputStructGuts, std::string HeaderFileName, std::string& SourceFile, std::string& HeaderFile)
+void OutputFullCppFile(std::string CppExpressionToExecute, std::string NamedInputStructGuts, std::string HeaderFileName, std::string& SourceFile, std::string& HeaderFile, const std::vector<ANLtoC::FunctionData>& FunctionList)
 {
 	SourceFile = OutputString;
 	HeaderFile = HeaderOutput;
+
+	std::string AdditionalFunctionString;
+	for (ANLtoC::FunctionData d : FunctionList)
+	{
+		AdditionalFunctionString += d.FunctionImplementation;
+		AdditionalFunctionString += "\n";
+	}
+
 	std::size_t Offset = SourceFile.find(CodeReplaceToken);
 	SourceFile.replace(Offset, CodeReplaceToken.size(), CppExpressionToExecute);
 	Offset = SourceFile.find(HeaderFileNameReplaceToken);
 	SourceFile.replace(Offset, HeaderFileNameReplaceToken.size(), HeaderFileName);
+	Offset = SourceFile.find(AdditionalFunctionsReplaceToken);
+	SourceFile.replace(Offset, AdditionalFunctionsReplaceToken.size(), AdditionalFunctionString);
 	Offset = HeaderFile.find(NamedInputReplaceToken);
 	HeaderFile.replace(Offset, NamedInputReplaceToken.size(), NamedInputStructGuts);
 }
