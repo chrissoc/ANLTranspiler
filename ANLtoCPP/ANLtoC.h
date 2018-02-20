@@ -19,7 +19,7 @@ namespace ANLtoC {
 		unsigned int RelatedIndex;
 	};
 
-	void KernelToC(anl::CKernel& Kernel, anl::CInstructionIndex& Root, std::string& ExpressionToExecute, std::string& NamedInputStructGuts, std::vector<FunctionData>& FunctionList);
+	void KernelToC(anl::CKernel& Kernel, const anl::CInstructionIndex& Root, std::string& ExpressionToExecute, std::string& NamedInputStructGuts, std::vector<FunctionData>& FunctionList);
 }
 
 
