@@ -169,7 +169,7 @@ namespace ANLtoC {
 	
 	// replaces ^ with the Point structure representing the current coordinates
 	// replaces ~ with an evaluated statment
-	template<int size>
+	template<std::size_t size>
 	std::string RecursiveFormat(ANLtoC_EmitData& Data, std::string Format, std::array<unsigned int, size> args, std::vector<FunctionData> &FunctionList)
 	{
 		int ArgIndex = 0;
@@ -771,7 +771,7 @@ namespace ANLtoC {
 	}
 }
 
-void ANLtoC::KernelToC(anl::CKernel& Kernel, anl::CInstructionIndex& Root, std::string& ExpressionToExecute, std::string& NamedInputStructGuts, std::vector<FunctionData> &FunctionList)
+void ANLtoC::KernelToC(anl::CKernel& Kernel, const anl::CInstructionIndex& Root, std::string& ExpressionToExecute, std::string& NamedInputStructGuts, std::vector<FunctionData> &FunctionList)
 {
 	ANLtoC_EmitData Data(*Kernel.getKernel());
 	Data.DomainInputStack.push_back("EvalPoint");
